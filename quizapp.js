@@ -72,61 +72,54 @@ var questionNum = "";
 
 
 
-function quizQuestionDisplay(questionsArray) {
+function quizQuestionDisplay(questionsArray, answerselected) {
 
-    console.log(questionsArray[currentQuestionNumber]);
+    //console.log(questionsArray[currentQuestionNumber]);
 
-    $('.button-next').click(function () {
-        $('#question').text(questionsArray[currentQuestionNumber].questionText);
-        $('#choices').empty();
-        $('.question-number').empty();
-        //2.2 - the get the total number of choices for the current question
-        var totalNumberOfChoices = questionsArray[currentQuestionNumber].choices.length;
-        //2.3 - loop through all the choices and append them to the choices container
-        console.log('totalNumberOfChoices' + totalNumberOfChoices);
 
-        for (var i = 0; i < totalNumberOfChoices; i++) {
-            console.log("am i coming in the for loop");
-            //2.3.1 - loop thru the answer choices and create a dynamically generated row for each of them
-            var buildEachChoiceHTML = "<input type='radio' class='option' name='option' value=" + i + "> " + questionsArray[currentQuestionNumber].choices[i] + "</br>";
-            //2.3.2 append that row to the choices container in html
-            console.log(buildEachChoiceHTML);
-            $('#choices').append(buildEachChoiceHTML);
+    $('#question').text(questionsArray[currentQuestionNumber].questionText);
+    $('#choices').empty();
+    $('.question-number').empty();
+    //2.2 - the get the total number of choices for the current question
+    var totalNumberOfChoices = questionsArray[currentQuestionNumber].choices.length;
+    //2.3 - loop through all the choices and append them to the choices container
+    //console.log('totalNumberOfChoices' + totalNumberOfChoices);
 
+    for (var i = 0; i < totalNumberOfChoices; i++) {
+        //console.log("am i coming in the for loop");
+        //2.3.1 - loop thru the answer choices and create a dynamically generated row for each of them
+        var buildEachChoiceHTML = "<input type='radio' class='option' name='option' value=" + i + "> " + questionsArray[currentQuestionNumber].choices[i] + "</br>";
+        //2.3.2 append that row to the choices container in html
+        //console.log(buildEachChoiceHTML);
+        $('#choices').append(buildEachChoiceHTML);
+
+    }
+
+    questionNumber = "<span>" + "Question" + " " + (currentQuestionNumber + 1) + " " + "of " + 10 + "</span>";
+    $('.question-number').append(questionNumber);
+
+
+
+
+
+
+    currentQuestionNumber++;
+
+    if (currentQuestionNumber === questionsArray.length) {
+        $('.quiz-section').hide();
+        $('.results').show();
+        if (score < 5) {
+            msg = "Please try again, It seems like you are in the beginning of your journey!";
+        } else if (score > 5 && score < 8) {
+            msg = "Well Done! Hang in there and keep practicing";
+        } else {
+            msg = "You made it to the next level";
         }
-
-        questionNumber = "<span>" + "Question" + " " + (currentQuestionNumber + 1) + " " + "of " + 10 + "</span>";
-        $('.question-number').append(questionNumber);
-
-        $('input').on('click', function () {
-            // alert($('input:radio[name=option]:checked').val());
-            answerselected = $('input:checked').val();
-            //alert(answerselected);
-            if (parseInt(answerselected) === questionsArray[currentQuestionNumber].answer) {
-                score++;
-
-            }
-        });
+        var buildResultHTML = "<span>" + msg + " Your score is " + score + "</span>";
+        $('.results').append(buildResultHTML);
+    }
 
 
-
-        currentQuestionNumber++;
-
-        if (currentQuestionNumber === questionsArray.length) {
-            $('.quiz-section').hide();
-            $('.results').show();
-            if (score < 5) {
-                msg = "Please try again, It seems like you are in the beginning of your journey!";
-            } else if (score > 5 && score < 8) {
-                msg = "Well Done! Hang in there and keep practicing";
-            } else {
-                msg = "You made it to the next level";
-            }
-            var buildResultHTML = "<span>" + msg + " Your score is " + score + "</span>";
-            $('.results').append(buildResultHTML);
-        }
-
-    })
 
 
 }
@@ -138,6 +131,9 @@ $(document).ready(function (event) {
     $('.quiz-section').hide();
     $('.results').hide();
 
+    $('#question').empty();
+    $('#choices').empty();
+
     $(".button-start").click(function (event) {
         $('.results').hide();
         $('.start').hide();
@@ -145,7 +141,30 @@ $(document).ready(function (event) {
         quizQuestionDisplay(questionsArray);
     });
 
+    $('.button-next').click(function () {
+        answerselected = $("input[class='option']:checked").val();
+        if (typeof answerselected === 'undefined' || !answerselected) {
+            alert("Please select one of the options above");
+        } else {
+            quizQuestionDisplay(questionsArray, answerselected);
+            // alert($('input:radio[name=option]:checked').val());
+            console.log(answerselected);
+            if (parseInt(answerselected) === questionsArray[currentQuestionNumber].answer) {
+                score++;
+
+            }
+        }
+    });
+
     $(".button-try").click(function (event) {
+        currentQuestionNumber = 0;
+        totalNumberOfQuestion = questionsArray.length;
+        totalNumberOfCorrectAnswers = 0;
+        checkedanswer = "";
+        score = 0;
+        answerSelected = "";
+        msg = "";
+        questionNum = "";
         $('.results').hide();
         $('.quiz-section').hide();
         $('.start').show();
